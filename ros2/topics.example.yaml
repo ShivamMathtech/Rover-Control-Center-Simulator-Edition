@@ -1,0 +1,8 @@
+# Proposed mapping only; this file is not consumed by the simulator.
+cmd_vel: /cmd_vel           # geometry_msgs/msg/Twist
+odometry: /odom             # nav_msgs/msg/Odometry
+imu: /imu                   # sensor_msgs/msg/Imu
+gps: /gps                   # sensor_msgs/msg/NavSatFix
+scan: /scan                 # sensor_msgs/msg/LaserScan
+battery: /battery           # sensor_msgs/msg/BatteryState
+camera_front: /camera/front # sensor_msgs/msg/Image

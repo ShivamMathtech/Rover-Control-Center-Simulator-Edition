@@ -1,0 +1,1688 @@
+You are a senior robotics software architect, full-stack engineer, UI/UX designer,
+computer-vision engineer, ROS engineer, embedded-systems engineer, and DevOps engineer.
+
+I want you to build a production-quality FULL-STACK CONTROL SOFTWARE for a
+4-wheel autonomous surveillance rover.
+
+The rover is a non-weaponized mobile robotics platform intended for lawful
+monitoring, inspection, navigation, mapping, research, and security/safety
+applications.
+
+DO NOT implement weapon control, targeting, firing, harmful payloads, or
+offensive capabilities.
+
+===========================================================
+1. PROJECT OBJECTIVE
+===========================================================
+
+Build a professional Ground Control Station (GCS) / Rover Control Center that
+allows an operator to:
+
+1. Monitor the rover in real time.
+2. View multiple live cameras simultaneously.
+3. Control the rover manually.
+4. Switch between MANUAL, ASSISTED and AUTONOMOUS modes.
+5. Plan and execute waypoint missions.
+6. Display the rover on a live map.
+7. Display GPS/RTK position and heading.
+8. Monitor all available rover sensors.
+9. Display battery and electrical telemetry.
+10. Display motor and hardware health.
+11. Display AI/computer-vision detections.
+12. Detect and visualize obstacles.
+13. Record telemetry and video metadata.
+14. Maintain mission history.
+15. Provide emergency-stop and fail-safe behavior.
+16. Provide a complete diagnostics interface.
+17. Operate even when some sensors/cameras are unavailable.
+18. Clearly distinguish simulated data from real hardware data.
+
+The software must be modular so that the simulator can be replaced by real
+hardware drivers without rewriting the frontend.
+
+===========================================================
+2. IMPORTANT ENGINEERING PRINCIPLE
+===========================================================
+
+DO NOT create a fake UI-only application.
+
+Build a REAL SOFTWARE ARCHITECTURE with:
+
+Frontend
+Backend API
+Real-time communication layer
+Rover hardware abstraction layer
+Sensor abstraction layer
+Camera/video subsystem
+Navigation subsystem
+Mapping subsystem
+Mission subsystem
+AI perception subsystem
+Database
+Logging
+Authentication
+Safety/failsafe subsystem
+Simulator
+
+Every subsystem must have clean interfaces.
+
+===========================================================
+3. RECOMMENDED TECHNOLOGY STACK
+===========================================================
+
+Frontend:
+
+- React
+- TypeScript
+- Vite
+- Tailwind CSS
+- shadcn/ui
+- Lucide icons
+- Zustand for state management
+- React Query/TanStack Query
+- MapLibre GL JS or another suitable map library
+- Recharts/ECharts for telemetry graphs
+- WebRTC for low-latency camera streaming
+- WebSocket for real-time telemetry
+- Responsive desktop-first layout
+
+Backend:
+
+- Python
+- FastAPI
+- Pydantic
+- SQLAlchemy
+- PostgreSQL
+- Redis where useful
+- WebSocket
+- REST API
+
+Robotics integration:
+
+- ROS 2
+- rosbridge/WebSocket where appropriate
+- MAVLink only if appropriate for the actual vehicle stack
+- Drivers must be abstracted behind interfaces
+
+Computer vision:
+
+- OpenCV
+- configurable object-detection backend
+- configurable tracking backend
+- configurable obstacle-detection backend
+
+Mapping/navigation:
+
+- GPS/RTK abstraction
+- IMU abstraction
+- wheel encoder abstraction
+- LiDAR/depth sensor abstraction
+- occupancy-grid representation
+- waypoint navigation abstraction
+
+Deployment:
+
+- Docker
+- Docker Compose
+- environment variables
+- development simulator
+- production configuration
+
+Testing:
+
+- Pytest
+- Vitest
+- React Testing Library
+- API integration tests
+- WebSocket tests
+- hardware-interface mock tests
+
+===========================================================
+4. PROJECT STRUCTURE
+===========================================================
+
+Create a clean monorepo:
+
+rover-control-center/
+
+    frontend/
+        src/
+            components/
+            pages/
+            layouts/
+            hooks/
+            stores/
+            services/
+            types/
+            utils/
+            map/
+            cameras/
+            telemetry/
+            controls/
+            missions/
+            diagnostics/
+
+    backend/
+        app/
+            api/
+            core/
+            models/
+            schemas/
+            services/
+            websocket/
+            robotics/
+            sensors/
+            cameras/
+            navigation/
+            missions/
+            perception/
+            safety/
+            telemetry/
+            simulator/
+            database/
+
+    ros2/
+        rover_interfaces/
+        rover_bringup/
+        rover_navigation/
+        rover_sensors/
+
+    simulator/
+        rover_simulator/
+
+    database/
+        migrations/
+        seed/
+
+    docker/
+
+    docs/
+
+    tests/
+
+    scripts/
+
+    docker-compose.yml
+
+    README.md
+
+    .env.example
+
+===========================================================
+5. MAIN UI
+===========================================================
+
+Create a professional dark robotics command-center interface.
+
+The design should look like a modern autonomous robotics Ground Control
+Station rather than a normal CRUD dashboard.
+
+Use:
+
+- dark navy/black background
+- high contrast telemetry
+- restrained blue accent
+- green for healthy systems
+- yellow/orange for warnings
+- red ONLY for critical alerts/emergency controls
+- glass/panel style where appropriate
+- compact telemetry cards
+- clear typography
+- no unnecessary decorative elements
+
+The application must work well at:
+
+1920x1080
+2560x1440
+1366x768
+
+===========================================================
+6. MAIN DASHBOARD
+===========================================================
+
+Create the following dashboard:
+
+-----------------------------------------------------------
+TOP STATUS BAR
+-----------------------------------------------------------
+
+Show:
+
+ROVER NAME
+Connection Status
+Network Status
+Battery %
+GPS/RTK status
+Current Mode
+Mission Status
+Current Time
+
+Example:
+
+ROVER-01
+● CONNECTED
+GPS: RTK FIX
+BATTERY: 78%
+MODE: AUTONOMOUS
+MISSION: PATROL ACTIVE
+
+-----------------------------------------------------------
+LEFT NAVIGATION
+-----------------------------------------------------------
+
+Dashboard
+Live Cameras
+Map & Navigation
+Mission Planner
+Rover Control
+Sensors
+AI Perception
+Telemetry
+Diagnostics
+Logs
+Recordings
+Settings
+
+===========================================================
+7. LIVE CAMERA CENTER
+===========================================================
+
+Create a dedicated multi-camera page.
+
+Support:
+
+Front
+Rear
+Left
+Right
+
+Optional:
+
+Pan/Tilt camera
+Thermal camera
+Depth camera
+360 camera
+
+Layout:
+
++----------------+----------------+
+| FRONT          | REAR           |
+| LIVE           | LIVE           |
++----------------+----------------+
+| LEFT           | RIGHT          |
+| LIVE           | LIVE           |
++----------------+----------------+
+
+Each camera tile must show:
+
+Camera name
+LIVE indicator
+Resolution
+FPS
+Latency
+Connection status
+Timestamp
+
+Controls:
+
+Fullscreen
+Snapshot
+Recording
+Mute if audio exists
+Camera settings
+
+Allow:
+
+1 camera
+2 cameras
+4 cameras
+1 large + 3 small
+
+layouts.
+
+===========================================================
+8. VIDEO ARCHITECTURE
+===========================================================
+
+Do NOT send raw video through normal REST APIs.
+
+Use:
+
+WebRTC for low-latency live video.
+
+Provide:
+
+CameraService
+VideoStreamManager
+WebRTC signaling
+
+The backend should expose camera metadata and stream negotiation.
+
+The frontend should automatically reconnect if a stream disconnects.
+
+Display:
+
+FPS
+Latency
+Resolution
+Connection quality
+
+===========================================================
+9. MAP & NAVIGATION
+===========================================================
+
+Create a full-screen professional navigation page.
+
+Display:
+
+Rover position
+Heading
+GPS accuracy
+RTK status
+Home position
+Waypoints
+Planned route
+Actual trajectory
+Geofence
+Obstacle zones
+Restricted zones
+Mission route
+
+Controls:
+
+Zoom
+Center on rover
+Follow rover
+Map/Satellite toggle
+Layer selector
+Add waypoint
+Delete waypoint
+Edit waypoint
+Create route
+Clear route
+
+Rover marker must rotate according to heading.
+
+Show breadcrumb trail of rover movement.
+
+===========================================================
+10. MANUAL ROVER CONTROL
+===========================================================
+
+Create a dedicated Rover Control page.
+
+Provide:
+
+Virtual joystick
+
+Forward
+Reverse
+Left
+Right
+Stop
+
+Speed slider.
+
+Show:
+
+Current speed
+Commanded speed
+Heading
+Steering state
+Motor state
+
+Provide control modes:
+
+MANUAL
+ASSISTED
+AUTONOMOUS
+
+Before enabling manual movement, show clear connection state and safety state.
+
+Implement dead-man behavior:
+
+If control input is lost for a configurable period:
+
+STOP
+
+Do not allow stale commands to continue indefinitely.
+
+===========================================================
+11. AUTONOMOUS MODE
+===========================================================
+
+Create an Autonomous Control panel.
+
+Modes:
+
+Waypoint Navigation
+Patrol
+Return Home
+Hold Position
+Explore/Mapping
+
+Display:
+
+Mission
+Current waypoint
+Distance to waypoint
+ETA
+Progress
+Current navigation state
+
+Controls:
+
+START
+PAUSE
+RESUME
+ABORT
+RETURN HOME
+
+Autonomous navigation must always have configurable safety boundaries.
+
+===========================================================
+12. MISSION PLANNER
+===========================================================
+
+Build a professional mission planner.
+
+Operator can:
+
+Create mission
+Name mission
+Add waypoints
+Reorder waypoints
+Edit waypoint coordinates
+Set waypoint actions
+Set route speed
+Set stop duration
+Save mission
+Load mission
+Duplicate mission
+Delete mission
+
+Mission states:
+
+DRAFT
+READY
+RUNNING
+PAUSED
+COMPLETED
+ABORTED
+FAILED
+
+Example:
+
+PATROL-001
+
+Waypoint 01
+Waypoint 02
+Waypoint 03
+Waypoint 04
+Return Home
+
+Display:
+
+Mission progress
+Distance travelled
+Elapsed time
+Estimated remaining time
+
+===========================================================
+13. SENSOR DASHBOARD
+===========================================================
+
+Create a comprehensive sensor page.
+
+GPS:
+
+Latitude
+Longitude
+Altitude
+HDOP
+VDOP
+Satellites
+Fix type
+RTK status
+
+IMU:
+
+Accelerometer X/Y/Z
+Gyroscope X/Y/Z
+Orientation
+Roll
+Pitch
+Yaw
+
+Compass:
+
+Heading
+Magnetic field
+
+Wheel:
+
+Left encoder
+Right encoder
+Wheel velocity
+
+Distance sensors:
+
+Front
+Rear
+Left
+Right
+
+LiDAR:
+
+Range
+Point count
+Connection
+Scan rate
+
+Battery:
+
+Voltage
+Current
+Power
+State of charge
+Temperature
+
+Motor:
+
+Motor RPM
+Temperature
+Current
+Voltage
+Health
+
+Network:
+
+RSSI
+Packet loss
+Latency
+Bandwidth
+
+===========================================================
+14. TELEMETRY PAGE
+===========================================================
+
+Create real-time graphs.
+
+Graphs:
+
+Speed
+Battery voltage
+Battery current
+Motor temperature
+CPU temperature
+GPS accuracy
+Network latency
+RSSI
+Roll
+Pitch
+Yaw
+Motor RPM
+
+Allow:
+
+Last 1 minute
+Last 5 minutes
+Last 30 minutes
+Last 1 hour
+Custom
+
+Allow export as:
+
+CSV
+JSON
+
+===========================================================
+15. AI PERCEPTION
+===========================================================
+
+Create a dedicated AI perception page.
+
+Use camera feeds as input.
+
+Display:
+
+Detected objects
+Bounding boxes
+Confidence
+Tracking IDs
+Detection FPS
+
+Example categories:
+
+Person
+Vehicle
+Animal
+Obstacle
+Unknown object
+
+Do not assume a detection is correct.
+
+Show confidence scores.
+
+Allow enabling/disabling:
+
+Object Detection
+Object Tracking
+Obstacle Detection
+Free-space Detection
+
+The perception system must be modular.
+
+Example interface:
+
+PerceptionEngine
+
+    detect(frame)
+    track(frame)
+    estimate_obstacles(frame)
+    get_results()
+
+Allow future replacement of the model without changing the frontend.
+
+===========================================================
+16. OBSTACLE AVOIDANCE
+===========================================================
+
+Create a safety visualization.
+
+Show:
+
+Front obstacle distance
+Left obstacle distance
+Right obstacle distance
+Rear obstacle distance
+
+Visualize:
+
+CLEAR
+WARNING
+CRITICAL
+
+If the rover is configured for autonomous operation, navigation should be
+able to consume obstacle information.
+
+Do NOT rely exclusively on camera AI for physical safety.
+
+Use dedicated ranging sensors where available.
+
+===========================================================
+17. ROVER HEALTH
+===========================================================
+
+Create a health dashboard.
+
+Systems:
+
+Battery
+Motors
+GPS
+IMU
+LiDAR
+Cameras
+Network
+Computer
+Storage
+
+Each system:
+
+HEALTHY
+WARNING
+ERROR
+OFFLINE
+
+Show diagnostics and timestamps.
+
+===========================================================
+18. SAFETY SYSTEM
+===========================================================
+
+This is a critical component.
+
+Implement:
+
+Emergency Stop
+Software Stop
+Command Timeout
+Communication Loss Detection
+Low Battery Protection
+Sensor Failure Detection
+Geofence Monitoring
+Autonomous Mission Abort
+
+Emergency Stop must be visually prominent.
+
+Example:
+
+[ EMERGENCY STOP ]
+
+When activated:
+
+Stop all movement commands
+Cancel active navigation commands
+Set rover state to SAFE_STOP
+Record event in logs
+
+Do not automatically restart movement after an emergency stop.
+
+Require explicit operator reset.
+
+If the actual rover has a hardware emergency-stop circuit,
+the software must NOT be treated as a replacement for that hardware safety
+mechanism.
+
+===========================================================
+19. COMMUNICATION ARCHITECTURE
+===========================================================
+
+Use:
+
+REST API
+WebSocket
+WebRTC
+
+REST:
+
+Configuration
+Mission CRUD
+Historical data
+Authentication
+
+WebSocket:
+
+Telemetry
+Rover state
+Sensor state
+Alerts
+Mission progress
+
+WebRTC:
+
+Live video
+
+Create reconnect logic.
+
+If WebSocket disconnects:
+
+Display:
+
+CONNECTION LOST
+
+and stop issuing movement commands until the safety policy allows reconnection.
+
+===========================================================
+20. DATA MODEL
+===========================================================
+
+Create database models:
+
+User
+Rover
+Camera
+Sensor
+Mission
+Waypoint
+Telemetry
+Alert
+EventLog
+Recording
+SystemHealth
+Geofence
+
+Example Rover:
+
+id
+name
+serial_number
+firmware_version
+connection_status
+mode
+battery
+latitude
+longitude
+heading
+created_at
+updated_at
+
+===========================================================
+21. API
+===========================================================
+
+Create documented APIs.
+
+Examples:
+
+GET /api/rovers
+GET /api/rovers/{id}
+
+GET /api/rovers/{id}/telemetry
+GET /api/rovers/{id}/sensors
+GET /api/rovers/{id}/health
+
+POST /api/rovers/{id}/mode
+POST /api/rovers/{id}/command
+
+GET /api/missions
+POST /api/missions
+PUT /api/missions/{id}
+DELETE /api/missions/{id}
+
+POST /api/missions/{id}/start
+POST /api/missions/{id}/pause
+POST /api/missions/{id}/resume
+POST /api/missions/{id}/abort
+
+POST /api/rovers/{id}/return-home
+
+POST /api/rovers/{id}/emergency-stop
+
+GET /api/cameras
+GET /api/cameras/{id}/stream
+
+===========================================================
+22. WEBSOCKET EVENTS
+===========================================================
+
+Define typed events.
+
+Examples:
+
+rover.status
+rover.telemetry
+rover.position
+rover.mode
+rover.health
+
+sensor.gps
+sensor.imu
+sensor.lidar
+sensor.battery
+
+camera.status
+
+mission.created
+mission.started
+mission.progress
+mission.completed
+mission.failed
+
+perception.detected
+
+alert.warning
+alert.critical
+
+safety.emergency_stop
+
+Use TypeScript types generated/shared from backend schemas where practical.
+
+===========================================================
+23. SIMULATOR
+===========================================================
+
+This is extremely important.
+
+Build a complete rover simulator so that the entire UI can be developed
+without physical hardware.
+
+Simulator should generate:
+
+GPS
+Heading
+Speed
+Battery
+IMU
+Wheel encoder
+LiDAR distances
+Motor temperature
+Network statistics
+Camera placeholder streams
+Mission progress
+Obstacle events
+
+Add controls:
+
+Simulate obstacle
+Simulate GPS loss
+Simulate camera loss
+Simulate low battery
+Simulate network loss
+Simulate sensor failure
+Simulate emergency stop
+
+The simulator must behave realistically enough to test the interface.
+
+===========================================================
+24. HARDWARE ABSTRACTION
+===========================================================
+
+NEVER hard-code hardware-specific communication throughout the application.
+
+Create interfaces:
+
+RoverDriver
+
+    connect()
+    disconnect()
+    set_velocity()
+    stop()
+    get_state()
+
+GPSDriver
+
+IMUDriver
+
+LidarDriver
+
+MotorDriver
+
+CameraDriver
+
+BatteryDriver
+
+SensorDriver
+
+Then implement:
+
+MockDriver
+SimulatorDriver
+
+and leave interfaces for:
+
+RealRoverDriver
+
+This allows the simulator to be replaced by actual rover hardware.
+
+===========================================================
+25. ROS 2 INTEGRATION
+===========================================================
+
+Prepare ROS 2 integration.
+
+Topics can include:
+
+/cmd_vel
+/odom
+/imu
+/gps
+/scan
+/camera/front
+/camera/rear
+/camera/left
+/camera/right
+/battery
+/joint_states
+
+Use appropriate ROS message types.
+
+Do not assume that these exact topics exist on the physical rover.
+Put topic names into configuration.
+
+Example:
+
+ROS_TOPIC_CMD_VEL=/cmd_vel
+ROS_TOPIC_GPS=/gps
+ROS_TOPIC_SCAN=/scan
+
+===========================================================
+26. AUTHENTICATION
+===========================================================
+
+Implement authentication.
+
+Roles:
+
+ADMIN
+OPERATOR
+VIEWER
+
+ADMIN:
+
+Everything
+
+OPERATOR:
+
+Control + missions + monitoring
+
+VIEWER:
+
+Read-only monitoring
+
+Never expose rover control endpoints without authorization.
+
+===========================================================
+27. AUDIT LOGGING
+===========================================================
+
+Record:
+
+Login
+Mode changes
+Mission creation
+Mission start
+Mission pause
+Mission abort
+Manual control activation
+Return-home command
+Emergency stop
+Configuration changes
+Connection failures
+
+Each event:
+
+timestamp
+user
+rover
+action
+result
+metadata
+
+===========================================================
+28. SETTINGS
+===========================================================
+
+Create settings pages for:
+
+Rover configuration
+Camera configuration
+Sensor configuration
+ROS configuration
+Network
+Map
+Units
+Telemetry rates
+Safety thresholds
+Geofence
+User accounts
+AI configuration
+
+Use environment variables for secrets.
+
+Never hard-code passwords, tokens or API keys.
+
+===========================================================
+29. NOTIFICATION SYSTEM
+===========================================================
+
+Create:
+
+Info
+Warning
+Critical
+
+notifications.
+
+Examples:
+
+GPS LOST
+LOW BATTERY
+OBSTACLE DETECTED
+CAMERA DISCONNECTED
+NETWORK UNSTABLE
+MOTOR TEMPERATURE HIGH
+MISSION COMPLETED
+MISSION ABORTED
+EMERGENCY STOP ACTIVE
+
+===========================================================
+30. OFFLINE BEHAVIOR
+===========================================================
+
+The UI must clearly indicate:
+
+ONLINE
+DEGRADED
+OFFLINE
+
+If the backend connection is lost:
+
+Do not pretend the rover is still connected.
+
+Display stale-data indicators.
+
+Disable unsafe controls when appropriate.
+
+===========================================================
+31. UI COMPONENTS
+===========================================================
+
+Create reusable components:
+
+RoverStatusCard
+BatteryCard
+GpsCard
+SpeedCard
+HeadingCard
+CameraTile
+MultiCameraGrid
+MapPanel
+Joystick
+TelemetryChart
+SensorCard
+MissionTimeline
+WaypointEditor
+AlertPanel
+HealthPanel
+EmergencyStop
+ModeSelector
+ConnectionIndicator
+ObstacleIndicator
+AIObjectOverlay
+SystemLog
+CommandConfirmationDialog
+
+===========================================================
+32. COMMAND CONFIRMATION
+===========================================================
+
+Require confirmation for important actions:
+
+Start autonomous mission
+Abort mission
+Return home
+Emergency reset
+Changing critical safety settings
+
+Do NOT require confirmation for every normal joystick movement because that
+would make manual operation unusable.
+
+===========================================================
+33. ACCESSIBILITY
+===========================================================
+
+Support:
+
+Keyboard navigation
+Clear focus states
+ARIA labels
+Readable typography
+High contrast
+Color + text indicators
+
+Do not rely solely on color.
+
+===========================================================
+34. PERFORMANCE
+===========================================================
+
+Optimize for:
+
+60 FPS UI where possible
+Low-latency telemetry
+Efficient WebSocket updates
+Efficient camera rendering
+Map rendering optimization
+Virtualized logs
+Throttled chart updates
+
+Do not re-render the entire dashboard for every telemetry packet.
+
+Use centralized state management and selective subscriptions.
+
+===========================================================
+35. SECURITY
+===========================================================
+
+Implement:
+
+Authentication
+Authorization
+Input validation
+Rate limiting
+CORS configuration
+Secure WebSocket handling
+Password hashing
+Session/token security
+Audit logs
+
+Never expose unrestricted command endpoints.
+
+Validate all rover commands server-side.
+
+===========================================================
+36. TESTING
+===========================================================
+
+Write tests for:
+
+Authentication
+API
+Mission creation
+Waypoint validation
+Mode switching
+Command validation
+Emergency stop
+Command timeout
+WebSocket reconnect
+Sensor failure
+GPS failure
+Battery warnings
+Simulator
+Frontend components
+
+Create integration tests for:
+
+Frontend → Backend → Simulator
+
+===========================================================
+37. DOCKER
+===========================================================
+
+Create Docker Compose services:
+
+frontend
+backend
+postgres
+redis
+simulator
+
+Optional:
+
+ros2
+
+One command should start the development environment:
+
+docker compose up --build
+
+===========================================================
+38. DEMO MODE
+===========================================================
+
+The application must launch in DEMO MODE by default.
+
+Demo mode should automatically populate:
+
+Rover position
+Moving map marker
+Battery percentage
+GPS
+IMU
+Camera placeholders
+Sensor values
+AI detections
+Mission progress
+
+The operator should be able to experience the entire application without
+physical hardware.
+
+===========================================================
+39. REAL HARDWARE MODE
+===========================================================
+
+Provide:
+
+MODE=simulation
+
+and
+
+MODE=hardware
+
+When:
+
+MODE=simulation
+
+use simulator drivers.
+
+When:
+
+MODE=hardware
+
+load configured hardware/ROS drivers.
+
+Never silently switch from simulation to real hardware.
+
+Clearly display:
+
+SIMULATION
+
+or
+
+LIVE HARDWARE
+
+in the UI.
+
+===========================================================
+40. FRONTEND ROUTES
+===========================================================
+
+Create:
+
+/dashboard
+/cameras
+/map
+/missions
+/control
+/sensors
+/perception
+/telemetry
+/diagnostics
+/logs
+/settings
+
+===========================================================
+41. DASHBOARD FINAL LAYOUT
+===========================================================
+
+The primary dashboard should look approximately like:
+
++---------------------------------------------------------------------+
+| ROVER-01 | CONNECTED | GPS RTK | BATTERY 78% | AUTO | 14:32:21      |
++----------+--------------------------------------+-------------------+
+|          |                                      |                   |
+| NAV      |          LIVE MAP                    | ROVER STATUS      |
+|          |                                      |                   |
+| CAMERAS  |    Rover + Route + Waypoints        | Speed             |
+|          |                                      | Heading           |
+| MISSIONS |                                      | Battery           |
+|          |                                      | GPS               |
+| CONTROL  +--------------------------------------+ IMU               |
+|          |                                      | Motors            |
+| SENSORS  |       MULTI CAMERA                  | Temperature       |
+|          |                                      |                   |
+| AI       |  FRONT | REAR | LEFT | RIGHT        |                   |
+|          |                                      |                   |
++----------+--------------------------------------+-------------------+
+| JOYSTICK | AUTO | MANUAL | ASSISTED | PAUSE | RETURN HOME | STOP   |
++---------------------------------------------------------------------+
+
+===========================================================
+42. DATABASE PERSISTENCE
+===========================================================
+
+Persist:
+
+Missions
+Waypoints
+Rover configurations
+Sensor configurations
+Telemetry history
+Events
+Alerts
+Users
+Geofences
+
+Do not store high-frequency raw telemetry indefinitely.
+
+Implement configurable retention.
+
+===========================================================
+43. LOGGING
+===========================================================
+
+Backend logs:
+
+INFO
+WARNING
+ERROR
+CRITICAL
+
+Frontend should expose operator-friendly logs.
+
+Do not expose secrets.
+
+===========================================================
+44. DOCUMENTATION
+===========================================================
+
+Generate:
+
+README.md
+Architecture documentation
+API documentation
+Setup instructions
+Simulator instructions
+ROS integration instructions
+Hardware integration instructions
+Database schema
+Environment variables
+Troubleshooting guide
+
+Include architecture diagrams in documentation.
+
+===========================================================
+45. DEVELOPMENT WORKFLOW
+===========================================================
+
+DO NOT generate the entire application as one giant unstructured file.
+
+Build it incrementally:
+
+PHASE 1
+Project scaffolding
+
+PHASE 2
+Database + backend
+
+PHASE 3
+Simulator
+
+PHASE 4
+WebSocket telemetry
+
+PHASE 5
+Frontend shell
+
+PHASE 6
+Dashboard
+
+PHASE 7
+Map
+
+PHASE 8
+Camera system
+
+PHASE 9
+Manual controller
+
+PHASE 10
+Mission planner
+
+PHASE 11
+Autonomous state machine
+
+PHASE 12
+Sensor dashboard
+
+PHASE 13
+AI perception
+
+PHASE 14
+Safety system
+
+PHASE 15
+Authentication
+
+PHASE 16
+Testing
+
+PHASE 17
+Docker deployment
+
+PHASE 18
+Hardware/ROS integration
+
+===========================================================
+46. STATE MACHINE
+===========================================================
+
+Implement a clearly defined rover state machine.
+
+States:
+
+DISCONNECTED
+CONNECTING
+IDLE
+MANUAL
+ASSISTED
+AUTONOMOUS
+PAUSED
+RETURNING_HOME
+SAFE_STOP
+EMERGENCY_STOP
+FAULT
+
+Define valid transitions.
+
+Never allow arbitrary state changes.
+
+===========================================================
+47. COMMAND VALIDATION
+===========================================================
+
+Every movement command must pass through:
+
+Frontend
+↓
+Backend validation
+↓
+Safety layer
+↓
+Rover driver
+
+Never allow frontend-only safety validation.
+
+Validate:
+
+Maximum speed
+Acceleration
+Current mode
+Connection
+Emergency state
+Battery state
+Geofence
+Sensor availability
+
+===========================================================
+48. FAILSAFE BEHAVIOR
+===========================================================
+
+Define configurable behavior for:
+
+Communication loss
+GPS loss
+Low battery
+Critical battery
+Obstacle detected
+Motor failure
+IMU failure
+Navigation failure
+
+Possible safe responses:
+
+STOP
+HOLD
+RETURN_HOME
+ABORT_MISSION
+
+The exact response must be configurable based on the rover platform.
+
+===========================================================
+49. VISUAL DESIGN
+===========================================================
+
+Make the UI feel like professional robotics software.
+
+Use:
+
+Dark command-center theme
+Compact information density
+Clear hierarchy
+Large map
+Large camera views
+Professional telemetry
+Minimal unnecessary animations
+
+Animations should communicate state rather than decoration.
+
+===========================================================
+50. FINAL DELIVERABLE
+===========================================================
+
+At completion provide:
+
+1. Complete source code
+2. Frontend
+3. Backend
+4. Database
+5. Simulator
+6. ROS integration layer
+7. Camera subsystem
+8. Mission planner
+9. Map system
+10. Sensor system
+11. AI perception interface
+12. Safety system
+13. Authentication
+14. Docker configuration
+15. Tests
+16. Documentation
+17. Environment configuration
+18. Seed/demo data
+
+The application must run using:
+
+docker compose up --build
+
+and then provide the frontend URL.
+
+===========================================================
+51. CRITICAL RULES
+===========================================================
+
+RULE 1:
+Do not create fake buttons that do nothing.
+
+RULE 2:
+Every UI control must connect to a real backend action or explicitly be
+marked as simulator functionality.
+
+RULE 3:
+Do not hard-code sensor values in production code.
+
+RULE 4:
+Separate simulator data from real hardware data.
+
+RULE 5:
+Never silently issue movement commands after connection recovery.
+
+RULE 6:
+Emergency stop must put the rover into a safe state.
+
+RULE 7:
+Do not implement weapon control or harmful payload functionality.
+
+RULE 8:
+Do not claim hardware functionality that has not actually been implemented.
+
+RULE 9:
+All hardware-specific configuration must be externalized.
+
+RULE 10:
+Write maintainable, typed, documented code.
+
+===========================================================
+52. START NOW
+===========================================================
+
+First create the complete architecture and directory structure.
+
+Then implement the project phase-by-phase.
+
+After each phase:
+
+1. Create the required files.
+2. Implement the functionality.
+3. Run tests.
+4. Fix errors.
+5. Verify integration.
+6. Explain what was implemented.
+7. Continue to the next phase.
+
+Do not stop at UI mockups.
+
+The final result must be a functioning autonomous rover Ground Control
+Station with a simulator that can demonstrate the complete workflow before
+connecting physical hardware.
